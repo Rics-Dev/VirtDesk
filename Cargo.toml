@@ -5,7 +5,13 @@ edition = "2024"
 
 [dependencies]
 anyhow = "1.0.104"
+color-eyre = "0.6.5"
+dirs = "6.0.0"
 gpui-kit = "0.6"
+tracing = "0.1.44"
+tracing-appender = "0.2.5"
+tracing-error = "0.2.1"
+tracing-subscriber = {version = "0.3.23", features = ["env-filter"]}
 
 
 [profile.release]
