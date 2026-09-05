@@ -1,0 +1,32 @@
+[package]
+name = "virtdesk"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1.0.104"
+gpui-kit = "0.6"
+
+
+[profile.release]
+codegen-units = 1
+lto = true
+
+
+
+[lints.clippy]
+pedantic = { level = "deny", priority = -1 }
+nursery = { level = "deny", priority = -1 }
+
+unwrap_used = "warn"
+expect_used = "warn"
+indexing_slicing = "warn"
+arithmetic_side_effects = "warn"
+string_slice = "warn"
+panic_in_result_fn = "warn"
+
+panic = "warn"
+todo = "warn"
+unimplemented = "warn"
+unreachable = "warn"
+as_conversions = "warn"
