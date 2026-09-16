@@ -11,6 +11,8 @@ use gpui_kit::{
     div,
 };
 
+use crate::qemu_backend::{QemuCmd, Format};
+
 #[derive(Default)]
 pub struct DashboardView;
 
@@ -34,7 +36,6 @@ impl DashboardView {
                             .child("VirtDesk")
                     ),
             )
-            // 2. Main content
             .child(
                 div()
                     .v_flex()
@@ -45,20 +46,13 @@ impl DashboardView {
                     .text_color(cx.theme().foreground)
                     .items_center()
                     .justify_center()
-                    .child(Button::new("dashboard-action").label("Click Me"))
                     .child(
-                        h_flex()
-                            .gap_10()
-                            .child(Tag::primary().child("Primary"))
-                            .child(Tag::secondary().child("Secondary")),
-                    )
-                    .child("Hello")
-                    .child(
-                        Button::new("dashboard-confirm")
+                        Button::new("create-vm")
                             .primary()
-                            .label("Let's Go!")
+                            .label("Create VM")
                             .on_click(|_, _, _| {
-                                info!("dashboard action clicked");
+                                // we create here
+                                launch_user_vm();
                             }),
                     ),
             )
@@ -69,4 +63,22 @@ impl Render for DashboardView {
     fn render(&mut self, _: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         Self::render_content(cx)
     }
+}
+
+
+pub fn launch_user_vm() -> std::io::Result<()> {
+    let mut vm_process = QemuCmd::new()
+        .enable_kvm()
+        .memory(2048)
+        .smp(2)
+        .cdrom("/home/ric/Downloads/ISO/alpine-virt-3.24.1-x86_64.iso")
+        .drive("/home/ric/Downloads/ISO/alpine.qcow2", Format::Qcow2)
+        .display("default")
+        .spawn()?;
+
+    println!("VM started with PID: {}", vm_process.id());
+    
+    let status = vm_process.wait()?;
+    println!("VM stopped with exit status: {status}");
+    Ok(())
 }

@@ -3,7 +3,8 @@ use color_eyre::eyre::Result;
 mod app;
 mod theme;
 pub mod tracing;
-pub mod virtual_machine;
+pub mod home;
+mod qemu_backend;
 
 fn main() -> Result<()> {
     color_eyre::install()?;
