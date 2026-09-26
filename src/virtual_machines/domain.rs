@@ -25,7 +25,12 @@ pub struct VirtualMachine {
 }
 
 impl VirtualMachine {
-    pub fn new(name: impl Into<String>, os: impl Into<String>, memory: u64, storage_gb: u64) -> Self {
+    pub fn new(
+        name: impl Into<String>,
+        os: impl Into<String>,
+        memory: u64,
+        storage_gb: u64,
+    ) -> Self {
         Self {
             name: name.into(),
             os: os.into(),

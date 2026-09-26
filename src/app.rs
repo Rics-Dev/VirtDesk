@@ -1,19 +1,20 @@
-use std::process::{Command, Stdio};
-
+use gpui_kit_assets::{AllAssets};
 use ::tracing::{error, info};
 use gpui_kit::component::{Root, Theme, TitleBar};
-use gpui_kit::{AppContext, WindowDecorations, WindowOptions};
+use gpui_kit::{AppContext, WindowBounds, WindowDecorations, WindowOptions, px, size};
 
-use crate::home::DashboardView;
+use crate::virtual_machines::VirtualMachineManager;
 
 pub fn run() {
     info!("Starting VirtDesk...");
 
-    let app = gpui_kit::application().with_assets(gpui_kit::assets::Assets);
+    let app = gpui_kit::application().with_assets(AllAssets);
 
     app.run(move |cx| {
         gpui_kit::init(cx);
         // theme::init(cx);
+
+        let window_bounds = WindowBounds::centered(size(px(1360.), px(840.)), cx);
 
         // match Connect::open(Some("qemu:///session")) {
         //     Ok(mut conn) => {
@@ -45,6 +46,8 @@ pub fn run() {
 
         cx.spawn(async move |cx| {
             let window_options = WindowOptions {
+                window_bounds: Some(window_bounds),
+                window_min_size: Some(size(px(760.), px(560.))),
                 titlebar: Some(TitleBar::title_bar_options()),
                 window_decorations: Some(WindowDecorations::Client),
                 ..Default::default()
@@ -59,8 +62,8 @@ pub fn run() {
                     })
                     .detach();
 
-                let dashboard = cx.new(|_| DashboardView::new());
-                cx.new(|cx| Root::new(dashboard, window, cx))
+                let machine_manager = cx.new(|_| VirtualMachineManager::new());
+                cx.new(|cx| Root::new(machine_manager, window, cx))
             }) {
                 error!(error = ?err, "Failed to initialize window");
                 std::process::exit(1);
@@ -88,6 +91,5 @@ pub fn run() {
         // let status = child.wait()?;
 
         // println!("QEMU exited with status: {}", status);
-
     });
 }
