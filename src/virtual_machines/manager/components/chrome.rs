@@ -1,32 +1,27 @@
-use gpui_kit::{Context, Div, FontWeight, ParentElement, Styled, div, px};
+use gpui_kit::{Div, FontWeight, ParentElement, Styled, div, px};
 use gpui_kit::{
     base::{h_flex, v_flex},
     component::TitleBar,
 };
 
-use gpui_kit::component::{Icon, IconName};
-use gpui_kit::component::{
-    Sizable as _,
-    button::{Button, ButtonGroup, ButtonVariants as _},
-};
+use gpui_kit::component::button::{Button, ButtonVariants as _};
+use gpui_kit::component::{Icon, IconName, Sizable as _};
 use tracing::info;
 
 use super::status_dot;
-use crate::virtual_machines::VirtualMachineManager;
-use crate::virtual_machines::manager::{
-    machine::MachineStatus, palette::color, responsive::ResponsiveLayout,
-};
+use crate::theme::palette;
+use crate::virtual_machines::manager::machine::MachineStatus;
 
 fn sidebar_item(mark: &'static str, label: &'static str, count: &'static str, active: bool) -> Div {
     let background = if active {
-        color(0x292b30)
+        palette::current().surface_selected
     } else {
-        color(0x18191c)
+        palette::current().sidebar
     };
     let foreground = if active {
-        color(0xe1e3e7)
+        palette::current().text_primary_bright
     } else {
-        color(0x9a9da4)
+        palette::current().text_secondary
     };
 
     h_flex()
@@ -40,11 +35,16 @@ fn sidebar_item(mark: &'static str, label: &'static str, count: &'static str, ac
             div()
                 .w(px(16.))
                 .text_sm()
-                .text_color(color(0x81858d))
+                .text_color(palette::current().text_icon)
                 .child(mark),
         )
         .child(div().flex_1().text_sm().child(label))
-        .child(div().text_xs().text_color(color(0x777b83)).child(count))
+        .child(
+            div()
+                .text_xs()
+                .text_color(palette::current().text_muted)
+                .child(count),
+        )
 }
 
 fn sidebar_group(title: &'static str) -> Div {
@@ -54,7 +54,7 @@ fn sidebar_group(title: &'static str) -> Div {
         .px_2()
         .text_xs()
         .font_weight(FontWeight::SEMIBOLD)
-        .text_color(color(0x686c74))
+        .text_color(palette::current().text_low)
         .child(title)
 }
 
@@ -64,9 +64,10 @@ pub(in crate::virtual_machines::manager) fn sidebar() -> Div {
         .h_full()
         .gap_1()
         .p_3()
-        .bg(color(0x18191c))
+        .bg(palette::current().sidebar)
         .border_r_1()
-        .border_color(color(0x2a2c30))
+        .shadow_xl()
+        .border_color(palette::current().border)
         .child(
             h_flex()
                 .gap_2()
@@ -76,30 +77,20 @@ pub(in crate::virtual_machines::manager) fn sidebar() -> Div {
                     div()
                         .size(px(28.))
                         .flex()
-                        .rounded_lg()
-                        .bg(color(0x18372e))
-                        .text_color(color(0x64d2a1))
+                        .rounded_sm()
+                        .bg(palette::current().surface_success)
+                        .text_color(palette::current().text_success)
                         .font_weight(FontWeight::BOLD)
                         .items_center()
                         .justify_center()
                         .child("V"),
                 )
                 .child(
-                    v_flex()
-                        .gap_0()
-                        .child(
-                            div()
-                                .text_sm()
-                                .font_weight(FontWeight::SEMIBOLD)
-                                .text_color(color(0xe6e7e9))
-                                .child("VirtDesk"),
-                        )
-                        .child(
-                            div()
-                                .text_xs()
-                                .text_color(color(0x777b83))
-                                .child("QEMU / KVM"),
-                        ),
+                    div()
+                        .text_sm()
+                        .font_weight(FontWeight::SEMIBOLD)
+                        .text_color(palette::current().text_primary_bright)
+                        .child("VirtDesk"),
                 ),
         )
         .child(sidebar_item("▦", "All machines", "12", true))
@@ -116,9 +107,9 @@ pub(in crate::virtual_machines::manager) fn sidebar() -> Div {
                 .gap_2()
                 .p_3()
                 .rounded_lg()
-                .bg(color(0x202125))
+                .bg(palette::current().surface_raised)
                 .border_1()
-                .border_color(color(0x2c2e33))
+                .border_color(palette::current().border)
                 .child(
                     h_flex()
                         .gap_2()
@@ -127,14 +118,14 @@ pub(in crate::virtual_machines::manager) fn sidebar() -> Div {
                             div()
                                 .text_xs()
                                 .font_weight(FontWeight::MEDIUM)
-                                .text_color(color(0xc8cbd0))
+                                .text_color(palette::current().text_status)
                                 .child("Local host connected"),
                         ),
                 )
                 .child(
                     div()
                         .text_xs()
-                        .text_color(color(0x777b83))
+                        .text_color(palette::current().text_muted)
                         .child("qemu:///session"),
                 ),
         )
@@ -142,8 +133,8 @@ pub(in crate::virtual_machines::manager) fn sidebar() -> Div {
 
 pub(in crate::virtual_machines::manager) fn title_bar() -> TitleBar {
     TitleBar::new()
-        .bg(color(0x1d1e21))
-        .border_color(color(0x2a2c30))
+        .bg(palette::current().surface)
+        .border_color(palette::current().border)
         .child(
             h_flex()
                 .w_full()
@@ -153,7 +144,7 @@ pub(in crate::virtual_machines::manager) fn title_bar() -> TitleBar {
                     div()
                         .text_sm()
                         .font_weight(FontWeight::MEDIUM)
-                        .text_color(color(0xd5d7db))
+                        .text_color(palette::current().text_primary)
                         .child("VirtDesk"),
                 )
                 .child(
@@ -172,25 +163,22 @@ pub(in crate::virtual_machines::manager) fn title_bar() -> TitleBar {
         )
 }
 
-pub(in crate::virtual_machines::manager) fn workspace_header(
-    view_switcher: Div,
-) -> Div {
-    let title =
-        v_flex()
-            .gap_1()
-            .child(
-                div()
-                    .text_xl()
-                    .font_weight(FontWeight::SEMIBOLD)
-                    .text_color(color(0xe5e7eb))
-                    .child("All machines"),
-            )
-            .child(
-                div()
-                    .text_xs()
-                    .text_color(color(0x858991))
-                    .child("Manage and connect to your virtual environments"),
-            );
+pub(in crate::virtual_machines::manager) fn workspace_header(view_switcher: Div) -> Div {
+    let title = v_flex()
+        .gap_1()
+        .child(
+            div()
+                .text_xl()
+                .font_weight(FontWeight::SEMIBOLD)
+                .text_color(palette::current().text_primary_bright)
+                .child("All machines"),
+        )
+        .child(
+            div()
+                .text_xs()
+                .text_color(palette::current().text_dim)
+                .child("Manage and connect to your virtual environments"),
+        );
 
     let controls = h_flex().flex_shrink_0().gap_2();
     h_flex()
@@ -211,11 +199,11 @@ pub(in crate::virtual_machines::manager) fn status_bar(
         .flex_shrink_0()
         .justify_between()
         .px_3()
-        .bg(color(0x191a1d))
+        .bg(palette::current().panel)
         .border_t_1()
-        .border_color(color(0x2a2c30))
+        .border_color(palette::current().border)
         .text_xs()
-        .text_color(color(0x777b83))
+        .text_color(palette::current().text_muted)
         .child(
             h_flex()
                 .gap_3()
@@ -229,13 +217,21 @@ pub(in crate::virtual_machines::manager) fn status_bar(
                     h_flex()
                         .gap_1()
                         .child(status_dot(MachineStatus::Running, 6.))
-                        .child(div().text_color(color(0x9da1a8)).child("8 running")),
+                        .child(
+                            div()
+                                .text_color(palette::current().text_status)
+                                .child("8 running"),
+                        ),
                 )
                 .child(
                     h_flex()
                         .gap_1()
                         .child(status_dot(MachineStatus::Error, 6.))
-                        .child(div().text_color(color(0xe47a74)).child("1 error")),
+                        .child(
+                            div()
+                                .text_color(palette::current().text_error)
+                                .child("1 error"),
+                        ),
                 )
                 .child(toggle_detail_panel_button),
         )

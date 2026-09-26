@@ -20,7 +20,7 @@ impl ResponsiveLayout {
 
         Self {
             show_sidebar: width >= px(980.),
-            show_vm_panel: width >= px(840.),
+            show_vm_panel: width >= px(1480.),
             grid_columns,
         }
     }

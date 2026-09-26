@@ -1,6 +1,5 @@
 mod components;
 mod machine;
-mod palette;
 mod responsive;
 mod view;
 

@@ -5,7 +5,8 @@ use gpui_kit::{
 };
 
 use super::status_dot;
-use crate::virtual_machines::manager::{machine::MachineStatus, palette::color};
+use crate::theme::palette;
+use crate::virtual_machines::manager::machine::MachineStatus;
 
 fn terminal_line(text: &'static str, tint: Hsla) -> Div {
     div()
@@ -21,27 +22,42 @@ fn terminal_preview() -> Div {
         .flex_shrink_0()
         .rounded_lg()
         .overflow_hidden()
-        .bg(color(0x0d0f12))
+        .bg(palette::current().preview_canvas)
         .border_1()
-        .border_color(color(0x30343a))
+        .border_color(palette::current().preview_border)
         .child(
             h_flex()
                 .h(px(34.))
                 .px_3()
                 .gap_2()
-                .bg(color(0x181a1e))
+                .bg(palette::current().preview_surface)
                 .border_b_1()
-                .border_color(color(0x2b2e33))
-                .child(div().size(px(8.)).rounded_full().bg(color(0xe45d58)))
-                .child(div().size(px(8.)).rounded_full().bg(color(0xd6ae42)))
-                .child(div().size(px(8.)).rounded_full().bg(color(0x49c28d)))
+                .border_color(palette::current().preview_border)
+                .child(
+                    div()
+                        .size(px(8.))
+                        .rounded_full()
+                        .bg(palette::current().accent_terminal_red),
+                )
+                .child(
+                    div()
+                        .size(px(8.))
+                        .rounded_full()
+                        .bg(palette::current().accent_terminal_yellow),
+                )
+                .child(
+                    div()
+                        .size(px(8.))
+                        .rounded_full()
+                        .bg(palette::current().accent_terminal_green),
+                )
                 .child(
                     div()
                         .min_w_0()
                         .pl_2()
                         .text_xs()
                         .font_family("monospace")
-                        .text_color(color(0x858991))
+                        .text_color(palette::current().preview_text_dim)
                         .truncate()
                         .child("SSH  ·  root@192.168.1.101"),
                 ),
@@ -52,37 +68,43 @@ fn terminal_preview() -> Div {
                 .p_3()
                 .child(terminal_line(
                     "Last login: Sat Sep 05 09:41:22 2026",
-                    color(0x777b83),
+                    palette::current().preview_text_muted,
                 ))
                 .child(div().h(px(8.)))
-                .child(terminal_line("root@prod-web-01:~# uptime", color(0x64d2a1)))
+                .child(terminal_line(
+                    "root@prod-web-01:~# uptime",
+                    palette::current().preview_text_success,
+                ))
                 .child(terminal_line(
                     " 10:48:12 up 4 days, 11:21, 1 user",
-                    color(0xc2c5ca),
+                    palette::current().preview_text,
                 ))
                 .child(terminal_line(
                     " load average: 0.95, 0.82, 0.68",
-                    color(0xc2c5ca),
+                    palette::current().preview_text,
                 ))
                 .child(div().h(px(8.)))
                 .child(terminal_line(
                     "root@prod-web-01:~# df -h /",
-                    color(0x64d2a1),
+                    palette::current().preview_text_success,
                 ))
                 .child(terminal_line(
                     "Filesystem  Size  Used  Avail  Use%",
-                    color(0x858991),
+                    palette::current().preview_text_dim,
                 ))
                 .child(terminal_line(
                     "/dev/sda1    60G   18G    40G   31% /",
-                    color(0xc2c5ca),
+                    palette::current().preview_text,
                 ))
                 .child(div().h(px(8.)))
                 .child(
                     h_flex()
                         .gap_1()
-                        .child(terminal_line("root@prod-web-01:~#", color(0x64d2a1)))
-                        .child(terminal_line("▍", color(0x64d2a1))),
+                        .child(terminal_line(
+                            "root@prod-web-01:~#",
+                            palette::current().preview_text_success,
+                        ))
+                        .child(terminal_line("▍", palette::current().preview_text_success)),
                 ),
         )
 }
@@ -94,14 +116,14 @@ fn detail_field(label: &'static str, value: &'static str) -> Div {
             div()
                 .text_xs()
                 .font_weight(FontWeight::MEDIUM)
-                .text_color(color(0x696d74))
+                .text_color(palette::current().text_low)
                 .child(label),
         )
         .child(
             div()
                 .text_xs()
                 .font_family("monospace")
-                .text_color(color(0xb7bbc2))
+                .text_color(palette::current().text_value)
                 .child(value),
         )
 }
@@ -110,9 +132,9 @@ pub(in crate::virtual_machines::manager) fn machine_detail_panel() -> Div {
     v_flex()
         .w_full()
         .h_full()
-        .bg(color(0x191a1d))
+        .bg(palette::current().panel)
         .border_l_1()
-        .border_color(color(0x2a2c30))
+        .border_color(palette::current().border)
         .child(
             h_flex()
                 .h(px(52.))
@@ -120,7 +142,7 @@ pub(in crate::virtual_machines::manager) fn machine_detail_panel() -> Div {
                 .justify_between()
                 .px_4()
                 .border_b_1()
-                .border_color(color(0x2a2c30))
+                .border_color(palette::current().border)
                 .child(
                     h_flex()
                         .gap_2()
@@ -129,11 +151,16 @@ pub(in crate::virtual_machines::manager) fn machine_detail_panel() -> Div {
                             div()
                                 .text_sm()
                                 .font_family("monospace")
-                                .text_color(color(0xd9dadd))
+                                .text_color(palette::current().text_primary)
                                 .child("prod-web-01"),
                         ),
                 )
-                .child(div().text_xs().text_color(color(0x777b83)).child("×")),
+                .child(
+                    div()
+                        .text_xs()
+                        .text_color(palette::current().text_muted)
+                        .child("×"),
+                ),
         )
         .child(
             v_flex()
@@ -154,13 +181,13 @@ pub(in crate::virtual_machines::manager) fn machine_detail_panel() -> Div {
                                     div()
                                         .text_sm()
                                         .font_weight(FontWeight::MEDIUM)
-                                        .text_color(color(0xd9dadd))
+                                        .text_color(palette::current().text_primary)
                                         .child("Ubuntu 24.04"),
                                 )
                                 .child(
                                     div()
                                         .text_xs()
-                                        .text_color(color(0x777b83))
+                                        .text_color(palette::current().text_muted)
                                         .child("Linux · 4 vCPU · 8 GB RAM"),
                                 ),
                         )
@@ -170,9 +197,9 @@ pub(in crate::virtual_machines::manager) fn machine_detail_panel() -> Div {
                                 .px_2()
                                 .py_1()
                                 .rounded_full()
-                                .bg(color(0x18372e))
+                                .bg(palette::current().surface_success)
                                 .text_xs()
-                                .text_color(color(0x71d5a9))
+                                .text_color(palette::current().accent_green_bright)
                                 .child("Running"),
                         ),
                 )
@@ -182,21 +209,21 @@ pub(in crate::virtual_machines::manager) fn machine_detail_panel() -> Div {
                         .flex_shrink_0()
                         .gap_4()
                         .border_b_1()
-                        .border_color(color(0x303237))
+                        .border_color(palette::current().border_strong)
                         .child(
                             div()
                                 .h_full()
                                 .px_1()
                                 .border_b_1()
-                                .border_color(color(0x59c798))
+                                .border_color(palette::current().accent_green_soft)
                                 .text_xs()
-                                .text_color(color(0xe0e2e6))
+                                .text_color(palette::current().text_primary_bright)
                                 .child("SSH terminal"),
                         )
                         .child(
                             div()
                                 .text_xs()
-                                .text_color(color(0x777b83))
+                                .text_color(palette::current().text_muted)
                                 .child("VM details"),
                         ),
                 )
@@ -209,7 +236,12 @@ pub(in crate::virtual_machines::manager) fn machine_detail_panel() -> Div {
                         .child(detail_field("IP ADDRESS", "192.168.1.101"))
                         .child(detail_field("UPTIME", "4d 11h")),
                 )
-                .child(div().h(px(40.)).border_t_1().border_color(color(0x292b30))),
+                .child(
+                    div()
+                        .h(px(40.))
+                        .border_t_1()
+                        .border_color(palette::current().border_subtle),
+                ),
         )
         .child(
             h_flex()
@@ -218,12 +250,12 @@ pub(in crate::virtual_machines::manager) fn machine_detail_panel() -> Div {
                 .gap_2()
                 .px_4()
                 .border_t_1()
-                .border_color(color(0x2a2c30))
+                .border_color(palette::current().border)
                 .child(status_dot(MachineStatus::Running, 7.))
                 .child(
                     div()
                         .text_xs()
-                        .text_color(color(0x858991))
+                        .text_color(palette::current().text_dim)
                         .child("Console preview · display only"),
                 ),
         )

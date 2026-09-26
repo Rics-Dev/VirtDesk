@@ -8,14 +8,15 @@ pub(super) use preview::machine_detail_panel;
 
 use gpui_kit::{Div, Hsla, Styled, div, px};
 
-use super::{machine::MachineStatus, palette::color};
+use super::machine::MachineStatus;
+use crate::theme::palette;
 
 pub(super) fn status_color(status: MachineStatus) -> Hsla {
     match status {
-        MachineStatus::Running => color(0x49c28d),
-        MachineStatus::Stopped => color(0x767980),
-        MachineStatus::Suspended => color(0xd6ae42),
-        MachineStatus::Error => color(0xe45d58),
+        MachineStatus::Running => palette::current().status_running,
+        MachineStatus::Stopped => palette::current().status_stopped,
+        MachineStatus::Suspended => palette::current().status_suspended,
+        MachineStatus::Error => palette::current().status_error,
     }
 }
 

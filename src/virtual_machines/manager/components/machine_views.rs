@@ -1,8 +1,7 @@
 use std::rc::Rc;
 
 use gpui_kit::{
-    Div, FontWeight, Hsla, InteractiveElement, IntoElement, ParentElement, Styled,
-    UniformListScrollHandle, div, px, uniform_list,
+    Div, FontWeight, Hsla, InteractiveElement, IntoElement, ParentElement, Styled, div, px,
 };
 use gpui_kit::{
     base::{h_flex, v_flex},
@@ -10,10 +9,8 @@ use gpui_kit::{
 };
 
 use super::{status_color, status_dot};
-use crate::virtual_machines::manager::{
-    machine::{MachineStatus, MachineSummary},
-    palette::color,
-};
+use crate::theme::palette;
+use crate::virtual_machines::manager::machine::{MachineStatus, MachineSummary};
 
 fn machine_metric(label: &'static str, value: &'static str, fill: f32, tint: Hsla) -> Div {
     h_flex()
@@ -23,7 +20,7 @@ fn machine_metric(label: &'static str, value: &'static str, fill: f32, tint: Hsl
             div()
                 .w(px(30.))
                 .text_xs()
-                .text_color(color(0x777b83))
+                .text_color(palette::current().text_muted)
                 .child(label),
         )
         .child(
@@ -31,14 +28,14 @@ fn machine_metric(label: &'static str, value: &'static str, fill: f32, tint: Hsl
                 .w(px(68.))
                 .h(px(4.))
                 .rounded_full()
-                .bg(color(0x303237))
+                .bg(palette::current().border_strong)
                 .child(div().w(px(fill)).h(px(4.)).rounded_full().bg(tint)),
         )
         .child(
             div()
                 .text_xs()
                 .font_family("monospace")
-                .text_color(color(0x9a9da4))
+                .text_color(palette::current().text_secondary)
                 .child(value),
         )
 }
@@ -46,19 +43,19 @@ fn machine_metric(label: &'static str, value: &'static str, fill: f32, tint: Hsl
 fn machine_card(machine: &MachineSummary) -> Div {
     let selected = machine.name == "prod-web-01";
     let card_background = if selected {
-        color(0x202522)
+        palette::current().surface_card_selected
     } else {
-        color(0x1d1e21)
+        palette::current().surface
     };
     let card_border = if selected {
-        color(0x315542)
+        palette::current().border_selected
     } else {
-        color(0x2a2c30)
+        palette::current().border
     };
     let cpu_tint = if machine.cpu_fill >= 68. {
-        color(0xe0645d)
+        palette::current().accent_red
     } else {
-        color(0x4e9df4)
+        palette::current().accent_blue
     };
 
     v_flex()
@@ -82,7 +79,7 @@ fn machine_card(machine: &MachineSummary) -> Div {
                         .text_sm()
                         .font_family("monospace")
                         .font_weight(FontWeight::MEDIUM)
-                        .text_color(color(0xd9dadd))
+                        .text_color(palette::current().text_primary)
                         .truncate()
                         .child(machine.name),
                 )
@@ -90,9 +87,9 @@ fn machine_card(machine: &MachineSummary) -> Div {
                     div()
                         .text_xs()
                         .text_color(if machine.starred {
-                            color(0xd7c16b)
+                            palette::current().accent_gold
                         } else {
-                            color(0x53565d)
+                            palette::current().text_faint
                         })
                         .child(if machine.starred { "★" } else { "" }),
                 ),
@@ -106,10 +103,10 @@ fn machine_card(machine: &MachineSummary) -> Div {
                         .flex()
                         .flex_shrink_0()
                         .rounded_sm()
-                        .bg(color(0x292b30))
+                        .bg(palette::current().surface_chip)
                         .text_xs()
                         .font_weight(FontWeight::SEMIBOLD)
-                        .text_color(color(0x9da1a8))
+                        .text_color(palette::current().text_status)
                         .items_center()
                         .justify_center()
                         .child(machine.os_mark),
@@ -118,7 +115,7 @@ fn machine_card(machine: &MachineSummary) -> Div {
                     div()
                         .min_w_0()
                         .text_xs()
-                        .text_color(color(0x858991))
+                        .text_color(palette::current().text_dim)
                         .truncate()
                         .child(machine.operating_system),
                 ),
@@ -133,7 +130,7 @@ fn machine_card(machine: &MachineSummary) -> Div {
             "MEM",
             machine.memory_label,
             machine.memory_fill,
-            color(0x49c28d),
+            palette::current().accent_green,
         ))
 }
 
@@ -164,7 +161,7 @@ fn table_column_header(label: &'static str, width: f32) -> Div {
         .flex_shrink_0()
         .text_xs()
         .font_weight(FontWeight::MEDIUM)
-        .text_color(color(0x777b83))
+        .text_color(palette::current().text_muted)
         .child(label)
 }
 
@@ -180,7 +177,7 @@ fn table_name_cell(machine: &MachineSummary) -> Div {
                 .min_w_0()
                 .text_sm()
                 .font_family("monospace")
-                .text_color(color(0xd9dadd))
+                .text_color(palette::current().text_primary)
                 .truncate()
                 .child(machine.name),
         )
@@ -191,7 +188,7 @@ fn table_os_cell(machine: &MachineSummary) -> Div {
         div()
             .min_w_0()
             .text_xs()
-            .text_color(color(0x969aa1))
+            .text_color(palette::current().text_tertiary)
             .truncate()
             .child(machine.operating_system),
     )
@@ -207,16 +204,16 @@ fn table_cpu_cell(machine: &MachineSummary) -> Div {
                 .w(px(46.))
                 .h(px(4.))
                 .rounded_full()
-                .bg(color(0x303237))
+                .bg(palette::current().border_strong)
                 .child(
                     div()
                         .w(px(machine.cpu_fill.min(46.)))
                         .h(px(4.))
                         .rounded_full()
                         .bg(if machine.cpu_fill >= 68. {
-                            color(0xe0645d)
+                            palette::current().accent_red
                         } else {
-                            color(0x4e9df4)
+                            palette::current().accent_blue
                         }),
                 ),
         )
@@ -224,7 +221,7 @@ fn table_cpu_cell(machine: &MachineSummary) -> Div {
             div()
                 .text_xs()
                 .font_family("monospace")
-                .text_color(color(0x9a9da4))
+                .text_color(palette::current().text_secondary)
                 .child(machine.cpu_label),
         )
 }
@@ -239,20 +236,20 @@ fn table_memory_cell(machine: &MachineSummary) -> Div {
                 .w(px(42.))
                 .h(px(4.))
                 .rounded_full()
-                .bg(color(0x303237))
+                .bg(palette::current().border_strong)
                 .child(
                     div()
                         .w(px(machine.memory_fill.min(42.)))
                         .h(px(4.))
                         .rounded_full()
-                        .bg(color(0x49c28d)),
+                        .bg(palette::current().accent_green),
                 ),
         )
         .child(
             div()
                 .text_xs()
                 .font_family("monospace")
-                .text_color(color(0x9a9da4))
+                .text_color(palette::current().text_secondary)
                 .child(machine.memory_label),
         )
 }
@@ -263,7 +260,7 @@ fn table_text_cell(text: &'static str, width: f32) -> Div {
         .flex_shrink_0()
         .text_xs()
         .font_family("monospace")
-        .text_color(color(0x858991))
+        .text_color(palette::current().text_dim)
         .truncate()
         .child(text)
 }
@@ -290,7 +287,7 @@ fn machine_table_row(machine: &MachineSummary) -> Div {
         .items_center()
         .justify_between()
         .border_b_1()
-        .border_color(color(0x292b30))
+        .border_color(palette::current().border_subtle)
         .child(table_name_cell(machine));
 
     row = row.child(table_os_cell(machine));
@@ -309,7 +306,7 @@ pub(in crate::virtual_machines::manager) fn machine_list(machines: Rc<Vec<Machin
         .items_center()
         .justify_between()
         .border_b_1()
-        .border_color(color(0x303237))
+        .border_color(palette::current().border_strong)
         .child(table_column_header("NAME", 230.));
 
     header = header.child(table_column_header("SYSTEM", 160.));

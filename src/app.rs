@@ -1,7 +1,7 @@
-use gpui_kit_assets::{AllAssets};
 use ::tracing::{error, info};
-use gpui_kit::component::{Root, Theme, TitleBar};
+use gpui_kit::component::{Root, TitleBar};
 use gpui_kit::{AppContext, WindowBounds, WindowDecorations, WindowOptions, px, size};
+use gpui_kit_assets::AllAssets;
 
 use crate::virtual_machines::VirtualMachineManager;
 
@@ -12,7 +12,6 @@ pub fn run() {
 
     app.run(move |cx| {
         gpui_kit::init(cx);
-        // theme::init(cx);
 
         let window_bounds = WindowBounds::centered(size(px(1400.), px(840.)), cx);
 
@@ -54,11 +53,11 @@ pub fn run() {
             };
 
             if let Err(err) = cx.open_window(window_options, |window, cx| {
-                Theme::sync_system_appearance(Some(window), cx);
+                crate::theme::sync_system_appearance(window, cx);
 
                 window
                     .observe_window_appearance(|window, cx| {
-                        Theme::sync_system_appearance(Some(window), cx);
+                        crate::theme::sync_system_appearance(window, cx);
                     })
                     .detach();
 

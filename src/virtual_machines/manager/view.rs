@@ -2,10 +2,7 @@ use std::rc::Rc;
 
 use gpui_kit::base::{Selectable, h_flex, v_flex};
 use gpui_kit::component::button::ButtonCustomVariant;
-use gpui_kit::{
-    Context, Div, IntoElement, ParentElement, Render, Styled, UniformListScrollHandle, Window, div,
-    px,
-};
+use gpui_kit::{Context, Div, IntoElement, ParentElement, Render, Styled, Window, div, px};
 
 use gpui_kit::component::resizable::{h_resizable, resizable_panel};
 
@@ -21,9 +18,9 @@ use super::{
         machine_detail_panel, machine_grid, machine_list, sidebar, status_bar, title_bar,
         workspace_header,
     },
-    palette::color,
     responsive::ResponsiveLayout,
 };
+use crate::theme::palette;
 
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 enum MachineViewMode {
@@ -70,9 +67,9 @@ impl VirtualMachineManager {
             MachineViewMode::List => "list-view-button",
         };
         let custom_style = ButtonCustomVariant::new(cx)
-            .color(color(0x24262a))
-            .foreground(color(0x92969e))
-            .active(color(0x34363b));
+            .color(palette::current().surface_control)
+            .foreground(palette::current().text_secondary)
+            .active(palette::current().surface_active);
 
         Button::new(id)
             .custom(custom_style)
@@ -95,9 +92,9 @@ impl VirtualMachineManager {
             .gap_1()
             .p_1()
             .rounded_lg()
-            .bg(color(0x1d1e21))
+            .bg(palette::current().surface)
             .border_1()
-            .border_color(color(0x2c2e33))
+            .border_color(palette::current().border)
             .child(self.view_mode_button(MachineViewMode::List, "List", cx))
             .child(self.view_mode_button(MachineViewMode::Grid, "Grid", cx))
     }
@@ -149,13 +146,14 @@ impl Render for VirtualMachineManager {
         let sidebar_button = self.sidebar_button(cx);
         let vm_panel_button = self.vm_panel_button(cx);
         let machine_content = match self.view_mode {
-            MachineViewMode::Grid => v_flex().flex_1().min_h_0().child(machine_grid(
-                self.machines.clone(),
-                responsive.grid_columns,
-            )),
-            MachineViewMode::List => v_flex().flex_1().min_h_0().child(machine_list(
-                self.machines.clone()
-            )),
+            MachineViewMode::Grid => v_flex()
+                .flex_1()
+                .min_h_0()
+                .child(machine_grid(self.machines.clone(), responsive.grid_columns)),
+            MachineViewMode::List => v_flex()
+                .flex_1()
+                .min_h_0()
+                .child(machine_list(self.machines.clone())),
         };
 
         let workspace = v_flex()
@@ -168,7 +166,11 @@ impl Render for VirtualMachineManager {
             .child(machine_content);
 
         let sidebar_content = if show_sidebar { sidebar() } else { div() };
-        let detail_content = if show_vm_panel { machine_detail_panel() } else { div() };
+        let detail_content = if show_vm_panel {
+            machine_detail_panel()
+        } else {
+            div()
+        };
 
         let content = h_resizable("vm-manager-layout")
             .child(
@@ -198,8 +200,8 @@ impl Render for VirtualMachineManager {
 
         v_flex()
             .size_full()
-            .bg(color(0x141518))
-            .text_color(color(0xd9dadd))
+            .bg(palette::current().canvas)
+            .text_color(palette::current().text_primary)
             .child(title_bar())
             .child(content)
             .child(status_bar(sidebar_button, vm_panel_button))
