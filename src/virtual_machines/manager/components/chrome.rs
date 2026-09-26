@@ -174,9 +174,8 @@ pub(in crate::virtual_machines::manager) fn title_bar() -> TitleBar {
 
 pub(in crate::virtual_machines::manager) fn workspace_header(
     view_switcher: Div,
-    responsive: &ResponsiveLayout,
 ) -> Div {
-    let title = if responsive.show_header_subtitle {
+    let title =
         v_flex()
             .gap_1()
             .child(
@@ -191,43 +190,9 @@ pub(in crate::virtual_machines::manager) fn workspace_header(
                     .text_xs()
                     .text_color(color(0x858991))
                     .child("Manage and connect to your virtual environments"),
-            )
-    } else {
-        v_flex().child(
-            div()
-                .text_lg()
-                .font_weight(FontWeight::SEMIBOLD)
-                .text_color(color(0xe5e7eb))
-                .child("All machines"),
-        )
-    };
+            );
 
-    let mut controls = h_flex().flex_shrink_0().gap_2();
-    controls = controls.child(
-        div()
-            .px_3()
-            .py_2()
-            .rounded_md()
-            .bg(color(0x1d1e21))
-            .border_1()
-            .border_color(color(0x2c2e33))
-            .text_xs()
-            .text_color(color(0x858991))
-            .child("⌕   Search machines"),
-    );
-    controls = controls.child(
-        div()
-            .px_2()
-            .py_2()
-            .rounded_md()
-            .bg(color(0x1d1e21))
-            .border_1()
-            .border_color(color(0x2c2e33))
-            .text_xs()
-            .text_color(color(0x9a9da4))
-            .child("☷  Filter"),
-    );
-
+    let controls = h_flex().flex_shrink_0().gap_2();
     h_flex()
         .justify_between()
         .items_center()

@@ -14,7 +14,7 @@ pub fn run() {
         gpui_kit::init(cx);
         // theme::init(cx);
 
-        let window_bounds = WindowBounds::centered(size(px(1360.), px(840.)), cx);
+        let window_bounds = WindowBounds::centered(size(px(1400.), px(840.)), cx);
 
         // match Connect::open(Some("qemu:///session")) {
         //     Ok(mut conn) => {

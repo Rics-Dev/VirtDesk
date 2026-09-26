@@ -1,4 +1,9 @@
-use gpui_kit::{Div, FontWeight, Hsla, IntoElement, ParentElement, Styled, div, px};
+use std::rc::Rc;
+
+use gpui_kit::{
+    Div, FontWeight, Hsla, InteractiveElement, IntoElement, ParentElement, Styled,
+    UniformListScrollHandle, div, px, uniform_list,
+};
 use gpui_kit::{
     base::{h_flex, v_flex},
     component::scroll::ScrollableElement,
@@ -6,9 +11,8 @@ use gpui_kit::{
 
 use super::{status_color, status_dot};
 use crate::virtual_machines::manager::{
-    machine::{MachineStatus, MachineSummary, SAMPLE_MACHINES},
+    machine::{MachineStatus, MachineSummary},
     palette::color,
-    responsive::ResponsiveLayout,
 };
 
 fn machine_metric(label: &'static str, value: &'static str, fill: f32, tint: Hsla) -> Div {
@@ -131,30 +135,26 @@ fn machine_card(machine: &MachineSummary) -> Div {
             machine.memory_fill,
             color(0x49c28d),
         ))
-        // .child(
-        //     h_flex()
-        //         .justify_between()
-        //         .pt_1()
-        //         .text_xs()
-        //         .font_family("monospace")
-        //         .text_color(color(0x767a82))
-        //         .child(machine.ip_address)
-        //         .child(machine.uptime),
-        // )
 }
 
-pub(in crate::virtual_machines::manager) fn machine_grid(columns: usize) -> impl IntoElement {
+pub(in crate::virtual_machines::manager) fn machine_grid(
+    machines: Rc<Vec<MachineSummary>>,
+    columns: usize,
+) -> impl IntoElement {
+    let columns = columns.max(1);
     let mut grid = v_flex().flex_1().min_h_0().gap_3().pr_1();
-    let column_count = columns.max(1);
-
-    for machine_row in SAMPLE_MACHINES.chunks(column_count) {
-        let mut row = h_flex().gap_3().items_stretch().flex_shrink_0();
+    for (row_index, machine_row) in machines.chunks(columns).enumerate() {
+        let mut row = h_flex()
+            .h(px(108.))
+            .gap_3()
+            .items_stretch()
+            .flex_shrink_0()
+            .id(("machine-grid-row", row_index));
         for machine in machine_row {
             row = row.child(machine_card(machine));
         }
         grid = grid.child(row);
     }
-
     grid.overflow_y_scrollbar().id("machine-grid")
 }
 
@@ -184,45 +184,17 @@ fn table_name_cell(machine: &MachineSummary) -> Div {
                 .truncate()
                 .child(machine.name),
         )
-        // .child(
-        //     div()
-        //         .text_xs()
-        //         .text_color(if machine.starred {
-        //             color(0xd7c16b)
-        //         } else {
-        //             color(0x53565d)
-        //         })
-        //         .child(if machine.starred { "★" } else { "" }),
-        // )
 }
 
 fn table_os_cell(machine: &MachineSummary) -> Div {
-    h_flex()
-        .w(px(160.))
-        .flex_shrink_0()
-        .gap_2()
-        // .child(
-        //     div()
-        //         .size(px(16.))
-        //         .flex()
-        //         .flex_shrink_0()
-        //         .rounded_sm()
-        //         .bg(color(0x292b30))
-        //         .text_xs()
-        //         .font_weight(FontWeight::SEMIBOLD)
-        //         .text_color(color(0x9da1a8))
-        //         .items_center()
-        //         .justify_center()
-        //         .child(machine.os_mark),
-        // )
-        .child(
-            div()
-                .min_w_0()
-                .text_xs()
-                .text_color(color(0x969aa1))
-                .truncate()
-                .child(machine.operating_system),
-        )
+    h_flex().w(px(160.)).flex_shrink_0().gap_2().child(
+        div()
+            .min_w_0()
+            .text_xs()
+            .text_color(color(0x969aa1))
+            .truncate()
+            .child(machine.operating_system),
+    )
 }
 
 fn table_cpu_cell(machine: &MachineSummary) -> Div {
@@ -310,44 +282,26 @@ fn table_status_cell(status: MachineStatus) -> Div {
         )
 }
 
-fn machine_table_row(machine: &MachineSummary, responsive: &ResponsiveLayout) -> Div {
-    let background = if machine.name == "prod-web-01" {
-        color(0x202522)
-    } else {
-        color(0x1d1e21)
-    };
+fn machine_table_row(machine: &MachineSummary) -> Div {
     let mut row = h_flex()
         .h(px(46.))
         .px_3()
         .gap_2()
         .items_center()
         .justify_between()
-        // .bg(background)
         .border_b_1()
         .border_color(color(0x292b30))
         .child(table_name_cell(machine));
 
-    if responsive.show_os_column {
-        row = row.child(table_os_cell(machine));
-    }
-    if responsive.show_cpu_column {
-        row = row.child(table_cpu_cell(machine));
-    }
-    if responsive.show_memory_column {
-        row = row.child(table_memory_cell(machine));
-    }
-    if responsive.show_ip_column {
-        row = row.child(table_text_cell(machine.ip_address, 170.));
-    }
-    if responsive.show_uptime_column {
-        row = row.child(table_text_cell(machine.uptime, 92.));
-    }
+    row = row.child(table_os_cell(machine));
+    row = row.child(table_cpu_cell(machine));
+    row = row.child(table_memory_cell(machine));
+    row = row.child(table_text_cell(machine.ip_address, 170.));
+    row = row.child(table_text_cell(machine.uptime, 92.));
     row.child(table_status_cell(machine.status))
 }
 
-pub(in crate::virtual_machines::manager) fn machine_list(
-    responsive: &ResponsiveLayout,
-) -> impl IntoElement {
+pub(in crate::virtual_machines::manager) fn machine_list(machines: Rc<Vec<MachineSummary>>) -> Div {
     let mut header = h_flex()
         .h(px(34.))
         .px_3()
@@ -358,32 +312,33 @@ pub(in crate::virtual_machines::manager) fn machine_list(
         .border_color(color(0x303237))
         .child(table_column_header("NAME", 230.));
 
-    if responsive.show_os_column {
-        header = header.child(table_column_header("SYSTEM", 160.));
-    }
-    if responsive.show_cpu_column {
-        header = header.child(table_column_header("CPU", 110.));
-    }
-    if responsive.show_memory_column {
-        header = header.child(table_column_header("MEMORY", 160.));
-    }
-    if responsive.show_ip_column {
-        header = header.child(table_column_header("IP ADDRESS", 170.));
-    }
-    if responsive.show_uptime_column {
-        header = header.child(table_column_header("UPTIME", 92.));
-    }
+    header = header.child(table_column_header("SYSTEM", 160.));
+    header = header.child(table_column_header("CPU", 110.));
+    header = header.child(table_column_header("MEMORY", 160.));
+    header = header.child(table_column_header("IP ADDRESS", 170.));
+    header = header.child(table_column_header("UPTIME", 92.));
     header = header.child(table_column_header("STATUS", 102.));
 
     let mut rows = v_flex().flex_1().min_h_0();
-    for machine in &SAMPLE_MACHINES {
-        rows = rows.child(machine_table_row(machine, responsive));
+    for (index, machine) in machines.iter().enumerate() {
+        rows = rows.child(machine_table_row(machine).id(("machine-list-row", index)));
     }
 
-    v_flex()
-        .flex_1()
-        .min_h_0()
-        .overflow_hidden()
-        .child(header)
-        .child(rows.overflow_y_scrollbar().id("machine-list"))
+    v_flex().flex_1().min_h_0().overflow_hidden().child(
+        v_flex()
+            .id("machine-list")
+            .w_full()
+            .flex_1()
+            .min_h_0()
+            .overflow_x_scrollbar()
+            .child(header)
+            .child(rows.overflow_y_scrollbar()),
+    )
+
+    // v_flex()
+    //     .flex_1()
+    //     .min_h_0()
+    //     .overflow_hidden()
+    //     .child(header)
+    //     .child(rows.overflow_y_scrollbar().id("machine-list"))
 }
