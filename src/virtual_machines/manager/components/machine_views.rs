@@ -331,11 +331,4 @@ pub(in crate::virtual_machines::manager) fn machine_list(machines: Rc<Vec<Machin
             .child(header)
             .child(rows.overflow_y_scrollbar()),
     )
-
-    // v_flex()
-    //     .flex_1()
-    //     .min_h_0()
-    //     .overflow_hidden()
-    //     .child(header)
-    //     .child(rows.overflow_y_scrollbar().id("machine-list"))
 }

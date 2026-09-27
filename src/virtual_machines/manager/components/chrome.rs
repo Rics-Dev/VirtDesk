@@ -1,3 +1,4 @@
+use gpui_kit::prelude::FluentBuilder;
 use gpui_kit::{Div, FontWeight, ParentElement, Styled, div, px};
 use gpui_kit::{
     base::{h_flex, v_flex},
@@ -131,7 +132,7 @@ pub(in crate::virtual_machines::manager) fn sidebar() -> Div {
         )
 }
 
-pub(in crate::virtual_machines::manager) fn title_bar() -> TitleBar {
+pub(in crate::virtual_machines::manager) fn title_bar(machines_empty: bool) -> TitleBar {
     TitleBar::new()
         .bg(palette::current().surface)
         .border_color(palette::current().border)
@@ -147,18 +148,20 @@ pub(in crate::virtual_machines::manager) fn title_bar() -> TitleBar {
                         .text_color(palette::current().text_primary)
                         .child("VirtDesk"),
                 )
-                .child(
-                    Button::new("New VM")
-                        .small()
-                        .compact()
-                        .primary()
-                        .cursor_pointer()
-                        .label("New VM")
-                        .icon(Icon::new(IconName::Plus))
-                        .on_click(|_, _, _| {
-                            info!("New VM button clicked");
-                        }),
-                )
+                .when(!machines_empty, |this| {
+                    this.child(
+                        Button::new("new-vm")
+                            .small()
+                            .compact()
+                            .primary()
+                            .cursor_pointer()
+                            .label("New VM")
+                            .icon(Icon::new(IconName::Plus))
+                            .on_click(|_, _, _| {
+                                info!("New VM button clicked");
+                            }),
+                    )
+                })
                 .mr_3(),
         )
 }

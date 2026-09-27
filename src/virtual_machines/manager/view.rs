@@ -2,15 +2,23 @@ use std::rc::Rc;
 
 use gpui_kit::base::{Selectable, h_flex, v_flex};
 use gpui_kit::component::button::ButtonCustomVariant;
+use gpui_kit::component::empty::{
+    Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyMediaVariant, EmptyTitle,
+};
+use gpui_kit::prelude::FluentBuilder;
+// use gpui_kit::component::sidebar::SidebarCollapsible::Icon;
 use gpui_kit::{Context, Div, IntoElement, ParentElement, Render, Styled, Window, div, px};
 
 use gpui_kit::component::resizable::{h_resizable, resizable_panel};
 
+use gpui_kit::component::Icon;
 use gpui_kit::component::{
     Sizable as _,
     button::{Button, ButtonVariants as _},
 };
 use gpui_kit_assets::IconName;
+use qapi::qmp::MirrorCopyMode::background;
+use tracing::info;
 
 use super::machine::{MachineSummary, SAMPLE_MACHINES};
 use super::{
@@ -162,8 +170,40 @@ impl Render for VirtualMachineManager {
             .min_h_0()
             .gap_1()
             .p_3()
-            .child(workspace_header(switcher))
-            .child(machine_content);
+            .when(self.machines.is_empty(), |this| {
+                this.items_center().justify_center().child(
+                    Empty::new()
+                        .header(
+                            EmptyHeader::new()
+                                .media(
+                                    EmptyMedia::new()
+                                        // .with_variant(EmptyMediaVariant::Icon)
+                                        .child(Icon::new(IconName::Monitor).size_20()),
+                                )
+                                .title(EmptyTitle::new().child("No virtual machines yet"))
+                                .description(
+                                    EmptyDescription::new()
+                                        .child("Create a virtual machine to get started."),
+                                ),
+                        )
+                        .content(
+                            EmptyContent::new().child(
+                                Button::new("create-vm")
+                                    .icon(Icon::new(IconName::Plus))
+                                    .primary()
+                                    .cursor_pointer()
+                                    .label("Create VM")
+                                    .on_click(cx.listener(|_, _, _, _| {
+                                        info!("Create VM button clicked");
+                                    })),
+                            ),
+                        ),
+                )
+            })
+            .when(!self.machines.is_empty(), |this| {
+                this.child(workspace_header(switcher))
+                    .child(machine_content)
+            });
 
         let sidebar_content = if show_sidebar { sidebar() } else { div() };
         let detail_content = if show_vm_panel {
@@ -202,7 +242,7 @@ impl Render for VirtualMachineManager {
             .size_full()
             .bg(palette::current().canvas)
             .text_color(palette::current().text_primary)
-            .child(title_bar())
+            .child(title_bar(self.machines.is_empty()))
             .child(content)
             .child(status_bar(sidebar_button, vm_panel_button))
     }
