@@ -1,5 +1,5 @@
 [package]
-name = "virtdesk"
+name = "virt-desk"
 version = "0.1.0"
 edition = "2024"
 
@@ -7,33 +7,54 @@ edition = "2024"
 anyhow = "1.0.104"
 color-eyre = "0.6.5"
 dirs = "6.0.0"
+directories = "6.0.0"
 gpui-kit = "0.6"
+gpui-kit-assets = "0.6"
+moka = { version = "0.12.16" , features = ["future"]}
+qapi = { version = "0.15", features = [ "qmp" ] }
 rust-i18n = "4.2.1"
+tokio = {version = "1.53.1" , features = ["full"]}
 tracing = "0.1.44"
 tracing-appender = "0.2.5"
 tracing-error = "0.2.1"
 tracing-subscriber = {version = "0.3.23", features = ["env-filter"]}
+virt = "0.4.3"
+turso = "0.7.2"
 
 
 [profile.release]
 codegen-units = 1
 lto = true
 
+[profile.dev]
+opt-level = 1
 
 
-[lints.clippy]
-pedantic = { level = "deny", priority = -1 }
-nursery = { level = "deny", priority = -1 }
+[profile.dev.package]
+gpui-pre = { opt-level = 3 }
+gpui-component = { opt-level = 3 }
+gpui-kit = { opt-level = 3 }
+gpui-kit-assets = { opt-level = 3 }
+gpui-pre-macros = { opt-level = 3 }
+gpui-pre-platform = { opt-level = 3 }
+rustybuzz = { opt-level = 3 }
+taffy = { opt-level = 3 }
+ttf-parser = { opt-level = 3 }
 
-unwrap_used = "warn"
-expect_used = "warn"
-indexing_slicing = "warn"
-arithmetic_side_effects = "warn"
-string_slice = "warn"
-panic_in_result_fn = "warn"
 
-panic = "warn"
-todo = "warn"
-unimplemented = "warn"
-unreachable = "warn"
-as_conversions = "warn"
+#[lints.clippy]
+#pedantic = { level = "deny", priority = -1 }
+#nursery = { level = "deny", priority = -1 }
+#
+#unwrap_used = "warn"
+#expect_used = "warn"
+#indexing_slicing = "warn"
+#arithmetic_side_effects = "warn"
+#string_slice = "warn"
+#panic_in_result_fn = "warn"
+#
+#panic = "warn"
+#todo = "warn"
+#unimplemented = "warn"
+#unreachable = "warn"
+#as_conversions = "warn"
