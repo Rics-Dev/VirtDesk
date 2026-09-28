@@ -1,7 +1,8 @@
+use gpui_kit::assets::AllAssets;
 use ::tracing::{error, info};
 use gpui_kit::component::TitleBar;
 use gpui_kit::{AppContext, WindowBounds, WindowDecorations, WindowOptions, px, size};
-use gpui_kit_assets::AllAssets;
+// use gpui_kit_assets::AllAssets;
 
 use crate::virtual_machines::VirtualMachineManager;
 

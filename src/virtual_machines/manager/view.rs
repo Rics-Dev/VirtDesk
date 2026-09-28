@@ -1,12 +1,12 @@
 use std::rc::Rc;
 
+use gpui_kit::assets::IconName;
 use gpui_kit::base::{Selectable, h_flex, v_flex};
 use gpui_kit::component::button::ButtonCustomVariant;
 use gpui_kit::component::empty::{
     Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyMediaVariant, EmptyTitle,
 };
 use gpui_kit::prelude::FluentBuilder;
-// use gpui_kit::component::sidebar::SidebarCollapsible::Icon;
 use gpui_kit::{Context, Div, IntoElement, ParentElement, Render, Styled, Window, div, px};
 
 use gpui_kit::component::resizable::{h_resizable, resizable_panel};
@@ -16,8 +16,6 @@ use gpui_kit::component::{
     Sizable as _,
     button::{Button, ButtonVariants as _},
 };
-use gpui_kit_assets::IconName;
-use qapi::qmp::MirrorCopyMode::background;
 use tracing::info;
 
 use super::machine::{MachineSummary, SAMPLE_MACHINES};

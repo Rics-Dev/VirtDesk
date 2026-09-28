@@ -9,7 +9,7 @@ pub mod virtual_machines;
 fn main() -> Result<()> {
     color_eyre::install()?;
 
-    tracing::init_tracing();
+    let _guard = tracing::init_tracing()?;
 
     app::run();
 
