@@ -8,8 +8,8 @@ anyhow = "1.0.104"
 color-eyre = "0.6.5"
 dirs = "6.0.0"
 directories = "6.0.0"
-gpui-kit = "0.6"
-gpui-kit-assets = "0.6"
+gpui-kit = "0.7"
+gpui-kit-assets = "0.7"
 moka = { version = "0.12.16" , features = ["future"]}
 qapi = { version = "0.15", features = [ "qmp" ] }
 rust-i18n = "4.2.1"

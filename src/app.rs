@@ -1,5 +1,5 @@
 use ::tracing::{error, info};
-use gpui_kit::component::{Root, TitleBar};
+use gpui_kit::component::TitleBar;
 use gpui_kit::{AppContext, WindowBounds, WindowDecorations, WindowOptions, px, size};
 use gpui_kit_assets::AllAssets;
 
@@ -47,22 +47,22 @@ pub fn run() {
             let window_options = WindowOptions {
                 window_bounds: Some(window_bounds),
                 window_min_size: Some(size(px(760.), px(560.))),
-                titlebar: Some(TitleBar::title_bar_options()),
                 window_decorations: Some(WindowDecorations::Client),
-                ..Default::default()
+                ..TitleBar::window_options()
             };
 
-            if let Err(err) = cx.open_window(window_options, |window, cx| {
-                crate::theme::sync_system_appearance(window, cx);
+            if let Err(err) = cx.update(|cx| {
+                gpui_kit::open_window(window_options, cx, |window, cx| {
+                    crate::theme::sync_system_appearance(window, cx);
 
-                window
-                    .observe_window_appearance(|window, cx| {
-                        crate::theme::sync_system_appearance(window, cx);
-                    })
-                    .detach();
+                    window
+                        .observe_window_appearance(|window, cx| {
+                            crate::theme::sync_system_appearance(window, cx);
+                        })
+                        .detach();
 
-                let machine_manager = cx.new(|_| VirtualMachineManager::new());
-                cx.new(|cx| Root::new(machine_manager, window, cx))
+                    cx.new(|_| VirtualMachineManager::new())
+                })
             }) {
                 error!(error = ?err, "Failed to initialize window");
                 std::process::exit(1);
