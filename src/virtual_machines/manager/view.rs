@@ -4,19 +4,20 @@ use gpui_kit::assets::IconName;
 use gpui_kit::base::{Selectable, h_flex, v_flex};
 use gpui_kit::component::button::ButtonCustomVariant;
 use gpui_kit::component::empty::{
-    Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia, EmptyMediaVariant, EmptyTitle,
+    Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyMedia,  EmptyTitle,
 };
 use gpui_kit::prelude::FluentBuilder;
-use gpui_kit::{Context, Div, IntoElement, ParentElement, Render, Styled, Window, div, px};
+use gpui_kit::{
+     Context, Div, IntoElement, ParentElement, Render, Styled, Window, div, px,
+};
 
 use gpui_kit::component::resizable::{h_resizable, resizable_panel};
 
-use gpui_kit::component::Icon;
+use gpui_kit::component::{Icon};
 use gpui_kit::component::{
     Sizable as _,
     button::{Button, ButtonVariants as _},
 };
-use tracing::info;
 
 use super::machine::{MachineSummary, SAMPLE_MACHINES};
 use super::{
@@ -27,6 +28,7 @@ use super::{
     responsive::ResponsiveLayout,
 };
 use crate::theme::palette;
+use crate::virtual_machines::manager::CreateVmWindow;
 
 #[derive(Clone, Copy, Debug, Default, Eq, PartialEq)]
 enum MachineViewMode {
@@ -191,9 +193,10 @@ impl Render for VirtualMachineManager {
                                     .primary()
                                     .cursor_pointer()
                                     .label("Create VM")
-                                    .on_click(cx.listener(|_, _, _, _| {
-                                        info!("Create VM button clicked");
-                                    })),
+                                    .on_click(|_, _, cx| {
+                                        CreateVmWindow::open(cx);
+                                        // VirtualMachineManager::open_create_vm_dialog(window, cx);
+                                    }),
                             ),
                         ),
                 )

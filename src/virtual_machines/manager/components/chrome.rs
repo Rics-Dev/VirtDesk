@@ -67,7 +67,7 @@ pub(in crate::virtual_machines::manager) fn sidebar() -> Div {
         .p_3()
         .bg(palette::current().sidebar)
         .border_r_1()
-        .shadow_xl()
+        .shadow_lg()
         .border_color(palette::current().border)
         .child(
             h_flex()
